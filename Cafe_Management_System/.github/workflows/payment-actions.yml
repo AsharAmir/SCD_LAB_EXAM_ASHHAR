@@ -1,0 +1,32 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'payment-services/**'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: ./menu-services
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/menu-service:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/menu-service:${{ github.sha }}
